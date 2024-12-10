@@ -19,7 +19,27 @@ const sentences = [
 // Function to calculate typing speed
 const calculateTypingSpeed = (timeTaken, totalWords) => {
     const typingSpeed = totalWords ? Math.round((totalWords / timeTaken) * 60) : 0;
-    score.textContent = `Your typing speed is ${typingSpeed} words per minute. You typed ${totalWords} words in ${timeTaken} seconds.`;
+    let resultMessage = '';
+    let emoji = '';
+
+    // Categorize results based on typing speed
+    if (typingSpeed >= 50) {
+        resultMessage = 'Excellent!';
+        emoji = '🌟';
+    } else if (typingSpeed >= 30) {
+        resultMessage = 'Average!';
+        emoji = '🙂';
+    } else {
+        resultMessage = 'Waste!';
+        emoji = '😞';
+    }
+
+    // Display result with typing speed and emoji
+    score.innerHTML = `
+        Your typing speed is <strong>${typingSpeed} WPM</strong>. 
+        You typed <strong>${totalWords} words</strong> in <strong>${timeTaken.toFixed(2)} seconds</strong>. 
+        <br>Result: <strong>${resultMessage}</strong> ${emoji}
+    `;
 };
 
 // Function to end typing test
@@ -34,8 +54,7 @@ const endTypingTest = () => {
 
     if (sentence.startsWith(typedText)) {
         // If correct text is typed, calculate and display typing speed
-        saveTestData(totalTimeTaken, totalWords); // Save test data
-        loadTestData(); // Load and display test data
+        calculateTypingSpeed(totalTimeTaken, totalWords);
     } else {
         // If wrong text is typed, display error message
         errorMessage.textContent = 'Dude! You typed the wrong text.';
@@ -44,8 +63,8 @@ const endTypingTest = () => {
 
     showSentence.textContent = "";
     typingGround.value = "";
+    typingGround.setAttribute('disabled', true);
 };
-
 
 // Function to start typing test
 const startTyping = () => {
@@ -55,6 +74,9 @@ const startTyping = () => {
     btn.textContent = "Done";
     typingGround.removeAttribute('disabled');
     typingGround.focus();
+    errorMessage.textContent = ''; // Clear previous error message
+    score.textContent = ''; // Clear previous score
+    typingGround.style.borderColor = ''; // Reset border color
 };
 
 // Event listener for button click
@@ -62,7 +84,6 @@ btn.addEventListener('click', () => {
     if (btn.textContent.toLowerCase() === "start test") {
         startTyping();
     } else if (btn.textContent.toLowerCase() === "done") {
-        typingGround.setAttribute('disabled', true);
         endTypingTest();
     }
 });
@@ -84,11 +105,6 @@ typingGround.addEventListener('input', () => {
         // Reset border color and error message
         typingGround.style.borderColor = ''; 
         errorMessage.textContent = ''; 
-        
-        const totalWords = typedText.split(/\s+/).filter(Boolean).length;
-        const timeTaken = (Date.now() - startTime) / 1000;
-        
-        calculateTypingSpeed(timeTaken, totalWords); // Display typing speed and other details
     } else {
         // Display error message and set border color to red for wrong input
         errorMessage.textContent = 'You wrote the wrong text.'; 
@@ -96,6 +112,3 @@ typingGround.addEventListener('input', () => {
         score.textContent = ''; // Clear typing speed display
     }
 });
-
-
-
